@@ -32,10 +32,10 @@ function chunkNodes(batchNodes: batchChunk[]) {
     const _chunk = result[result.length - 1];
     if (!_chunk || _chunk.type !== type) {
       result.push({
-        type: type,
-        nodes
-      })
-    } else{
+        type,
+        nodes,
+      });
+    } else {
       _chunk.nodes = _chunk.nodes.concat(nodes);
     }
   }
@@ -55,20 +55,19 @@ function endBatch() {
     Promise.resolve().then(() => {
       const chunks = chunkNodes(__batchNodes);
       const rootViewId = getRootViewId();
-      chunks.forEach(chunk => {
+      chunks.forEach((chunk) => {
         const optType = chunk.type;
         if (optType === batchType.createNode) {
           trace(...componentName, optType, chunk.nodes);
           UIManagerModule.createNode(rootViewId, chunk.nodes);
-        }
-        // 删除和更新批量操作会有问题，需要逐个调用bridge
-        else {
-          chunk.nodes.forEach(node => {
+        } else {
+          // 删除和更新批量操作会有问题，需要逐个调用bridge
+          chunk.nodes.forEach((node) => {
             trace(...componentName, optType, chunk.nodes);
             UIManagerModule[optType](rootViewId, [node]);
-          })
+          });
         }
-      })
+      });
       UIManagerModule.endBatch(__renderId);
       __batchNodes = [];
       __batchIdle = true;
@@ -156,8 +155,8 @@ function insertChild(parentNode: ViewNode, childNode: ViewNode, atIndex = -1) {
     startBatch();
     __batchNodes.push({
       type: batchType.createNode,
-      nodes: translated
-    })
+      nodes: translated,
+    });
     endBatch();
     parentNode.traverseChildren((node: ViewNode) => {
       if (!node.isMounted) {
@@ -171,7 +170,7 @@ function insertChild(parentNode: ViewNode, childNode: ViewNode, atIndex = -1) {
     startBatch();
     __batchNodes.push({
       type: batchType.createNode,
-      nodes: translated
+      nodes: translated,
     });
     endBatch();
     childNode.traverseChildren((node: ViewNode) => {
@@ -202,7 +201,7 @@ function removeChild(parentNode: ViewNode, childNode: ViewNode) {
   startBatch();
   __batchNodes.push({
     type: batchType.deleteNode,
-    nodes: deleteNodeIds
+    nodes: deleteNodeIds,
   });
   endBatch();
 }
@@ -215,10 +214,10 @@ function updateChild(parentNode: Element) {
   const translated = renderToNative(rootViewId, parentNode);
   // trace(...componentName, 'updateNode', translated);
   startBatch();
-  if(translated) {
+  if (translated) {
     __batchNodes.push({
       type: batchType.updateNode,
-      nodes: [translated]
+      nodes: [translated],
     });
   }
   endBatch();
@@ -234,7 +233,7 @@ function updateWithChildren(parentNode: ViewNode) {
   startBatch();
   __batchNodes.push({
     type: batchType.updateNode,
-    nodes: translated
+    nodes: translated,
   });
   // translated.forEach((item) => {
   //   UIManagerModule.updateNode(rootViewId, [item]);
