@@ -25,13 +25,11 @@ let __renderId: number = 0;
 let __batchNodes: batchChunk[] = [];
 
 function chunkNodes(batchNodes: batchChunk[]) {
-  let result: batchChunk[] = [];
-  for(let i = 0; i < batchNodes.length; i++) {
-    let chunk: batchChunk = batchNodes[i];
-    let type = chunk.type;
-    let nodes = chunk.nodes;
-
-    let _chunk = result[result.length - 1];
+  const result: batchChunk[] = [];
+  for (let i = 0; i < batchNodes.length; i += 1) {
+    const chunk: batchChunk = batchNodes[i];
+    const { type, nodes } = chunk;
+    const _chunk = result[result.length - 1];
     if (!_chunk || _chunk.type !== type) {
       result.push({
         type: type,
@@ -62,7 +60,7 @@ function endBatch() {
         if (optType === batchType.createNode) {
           trace(...componentName, optType, chunk.nodes);
           UIManagerModule.createNode(rootViewId, chunk.nodes);
-        } 
+        }
         // 删除和更新批量操作会有问题，需要逐个调用bridge
         else {
           chunk.nodes.forEach(node => {
@@ -174,7 +172,7 @@ function insertChild(parentNode: ViewNode, childNode: ViewNode, atIndex = -1) {
     __batchNodes.push({
       type: batchType.createNode,
       nodes: translated
-    })
+    });
     endBatch();
     childNode.traverseChildren((node: ViewNode) => {
       if (!node.isMounted) {
@@ -205,7 +203,7 @@ function removeChild(parentNode: ViewNode, childNode: ViewNode) {
   __batchNodes.push({
     type: batchType.deleteNode,
     nodes: deleteNodeIds
-  })
+  });
   endBatch();
 }
 
@@ -221,8 +219,8 @@ function updateChild(parentNode: Element) {
     __batchNodes.push({
       type: batchType.updateNode,
       nodes: [translated]
-    })
-  }  
+    });
+  }
   endBatch();
 }
 
@@ -237,7 +235,7 @@ function updateWithChildren(parentNode: ViewNode) {
   __batchNodes.push({
     type: batchType.updateNode,
     nodes: translated
-  })
+  });
   // translated.forEach((item) => {
   //   UIManagerModule.updateNode(rootViewId, [item]);
   // });
