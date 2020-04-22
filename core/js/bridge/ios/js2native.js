@@ -309,9 +309,10 @@ Hippy.bridge.callNativeWithPromise = (...callArguments) => {
       callModuleMethod.apply(NativeModule,
         getParam(callArguments[0], callArguments[1], param));
     });
-  }
+  }  
 
-  throw new ReferenceError('Native module[func] not found');
+  // throw new ReferenceError('Native module[func] not found');
+  return Promise.reject(new ReferenceError('Native module[func] not found'));
 };
 
 Hippy.bridge.callNativeWithCallbackId = (...callArguments) => {
