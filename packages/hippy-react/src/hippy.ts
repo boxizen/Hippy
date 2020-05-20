@@ -1,9 +1,11 @@
+import Hippy from '@localTypes/hippy'
 import React, { FunctionComponent, ComponentClass } from 'react';
 import Document from './dom/document-node';
 import renderer from './renderer';
 import * as Native from './native';
 import { setRootContainer } from './utils/node';
 import { trace, warn, setSilent } from './utils';
+import {native2Element} from './renderer/hydrate';
 
 const {
   createContainer,
@@ -27,6 +29,12 @@ interface HippyReactConfig {
    * Disable trace output
    */
   silent?: boolean;
+
+  /**
+   * support hydrate
+   */
+  hydrate?: boolean;
+  nativeNodes? : Hippy.NativeNode[]
 
   /**
    * The callback after rendering.
@@ -75,7 +83,7 @@ class HippyReact implements HippyReact {
 
     // Start Render
     const rootDocument = new Document();
-    this.rootContainer = createContainer(rootDocument, false, false);
+    this.rootContainer = createContainer(rootDocument, false, config.hydrate || false);
   }
 
   /**
@@ -111,8 +119,12 @@ class HippyReact implements HippyReact {
     // Render to screen.
     const rootElement = React.createElement(entryPage, superProps);
     updateContainer(rootElement, this.rootContainer, null, callback);
+    if(this.config.hydrate && this.config.nativeNodes){
+      native2Element(this.rootContainer.containerInfo,  this.config.nativeNodes);
+    }
     return getPublicRootInstance(this.rootContainer);
   }
 }
 
 export default HippyReact;
+  
